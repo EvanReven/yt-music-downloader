@@ -2,19 +2,25 @@ import React, { useState } from 'react';
 import { Search, Link as LinkIcon, Sparkles, AlertCircle, ArrowRight, Music2, ListMusic, RefreshCw } from 'lucide-react';
 import { DemoPlaylist } from '../types';
 import { DEMO_PLAYLISTS } from '../lib/opusConverter';
+import { Language, translations } from '../lib/i18n';
 
 interface HeroSectionProps {
   onFetchPlaylist: (input: string) => void;
   isLoading: boolean;
   errorMessage?: string;
+  containerFormat?: string;
+  lang: Language;
 }
 
 export const HeroSection: React.FC<HeroSectionProps> = ({
   onFetchPlaylist,
   isLoading,
   errorMessage,
+  containerFormat = 'mp3',
+  lang,
 }) => {
   const [inputUrl, setInputUrl] = useState('');
+  const t = translations[lang];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +34,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     onFetchPlaylist(demo.url);
   };
 
+  const fmtUpper = containerFormat.toUpperCase();
+  const fmtLower = containerFormat.toLowerCase();
+
   return (
     <div className="relative overflow-hidden pt-8 pb-12 px-4 sm:px-6 lg:px-8 border-b border-white/5 bg-[#0a0a0a]">
       {/* Background Subtle Indigo Glow */}
@@ -37,18 +46,18 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         {/* Main Badge */}
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-semibold mb-6 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-spin-slow" />
-          <span>Format Opus Audio (RFC 6716) • Efisiensi Tinggi & Suara Jernih</span>
+          <span>{t.heroBadge} .{fmtUpper} {t.heroBadgeSuffix}</span>
         </div>
 
         {/* Main Headline */}
         <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-          Download Playlist YouTube ke{' '}
+          {t.heroTitlePrefix}{' '}
           <span className="text-indigo-500">
-            Format Opus
+            {t.heroTitleHighlight} .{fmtUpper}
           </span>
         </h2>
         <p className="mt-4 text-base sm:text-lg text-gray-400 max-w-2xl mx-auto">
-          Masukkan link playlist YouTube atau kata kunci pencarian. Konversi audio otomatis ke format <strong className="text-gray-200 font-semibold">.opus</strong> hemat ruang dengan kualitas studio.
+          {t.heroSubtitle1} <strong className="text-gray-200 font-semibold">.{fmtLower}</strong> {t.heroSubtitle2}
         </p>
 
         {/* URL Input Form */}
@@ -62,7 +71,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               type="text"
               value={inputUrl}
               onChange={(e) => setInputUrl(e.target.value)}
-              placeholder="Tempel link playlist/video YouTube (cth: https://www.youtube.com/playlist?list=...)"
+              placeholder={t.inputPlaceholder}
               className="w-full bg-transparent py-2.5 px-2 text-white text-sm placeholder:text-gray-500 focus:outline-none"
               disabled={isLoading}
             />
@@ -75,11 +84,11 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
               {isLoading ? (
                 <>
                   <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                  <span>Memuat...</span>
+                  <span>{t.btnLoading}</span>
                 </>
               ) : (
                 <>
-                  <span>Muat Playlist</span>
+                  <span>{t.btnSearch}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -92,7 +101,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <div className="mt-6 max-w-2xl mx-auto p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm flex items-start gap-3 text-left animate-fadeIn">
             <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
             <div>
-              <strong className="font-semibold block text-red-200">Gagal Memuat Playlist</strong>
+              <strong className="font-semibold block text-red-200">
+                {lang === 'id' ? 'Gagal Memuat Playlist' : 'Failed to Load Playlist'}
+              </strong>
               <span>{errorMessage}</span>
             </div>
           </div>
@@ -102,7 +113,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <div className="mt-10 text-left max-w-3xl mx-auto">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-500 mb-3 px-1">
             <ListMusic className="w-4 h-4 text-indigo-400" />
-            <span>Atau Coba Contoh Playlist Populer Ini:</span>
+            <span>{t.quickTry}</span>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -124,7 +135,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
                 </div>
                 <div className="min-w-0 flex-1">
                   <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider block">
-                    {demo.tag} • {demo.count} Lagu
+                    {demo.tag} • {demo.count} {lang === 'id' ? 'Lagu' : 'Songs'}
                   </span>
                   <h4 className="text-xs font-bold text-gray-200 truncate group-hover:text-indigo-300 transition-colors">
                     {demo.title}
@@ -139,3 +150,4 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     </div>
   );
 };
+

@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { X, Music, Download, Play, ExternalLink } from 'lucide-react';
 import { Track } from '../types';
+import { Language, translations } from '../lib/i18n';
 
 interface AudioPreviewModalProps {
   track: Track | null;
   onClose: () => void;
   onDownloadSingle: (track: Track) => void;
+  lang?: Language;
 }
 
 export const AudioPreviewModal: React.FC<AudioPreviewModalProps> = ({
   track,
   onClose,
   onDownloadSingle,
+  lang = 'id',
 }) => {
   const [useDirectAudio, setUseDirectAudio] = useState(false);
+  const t = translations[lang];
 
   if (!track) return null;
 
@@ -28,7 +32,7 @@ export const AudioPreviewModal: React.FC<AudioPreviewModalProps> = ({
           <div className="flex items-center gap-2">
             <Music className="w-4 h-4 text-indigo-400 animate-pulse" />
             <span className="text-xs font-bold text-indigo-400 uppercase tracking-wider">
-              Pratinjau Instan
+              {t.instantPreview}
             </span>
           </div>
           <button
@@ -52,7 +56,7 @@ export const AudioPreviewModal: React.FC<AudioPreviewModalProps> = ({
           </div>
         ) : (
           <div className="p-3 rounded-xl bg-white/5 border border-white/10 mb-3 text-center">
-            <p className="text-xs text-indigo-300 font-medium mb-2">Memutar dari Server Audio Proxy Stream...</p>
+            <p className="text-xs text-indigo-300 font-medium mb-2">{t.playingFromProxy}</p>
             <audio
               src={directAudioSrc}
               controls
@@ -73,9 +77,9 @@ export const AudioPreviewModal: React.FC<AudioPreviewModalProps> = ({
             <button
               onClick={() => setUseDirectAudio(!useDirectAudio)}
               className="px-2 py-1 rounded-md text-[10px] font-semibold text-gray-400 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
-              title={useDirectAudio ? "Gunakan Pemutar Instan" : "Gunakan Stream Proxy"}
+              title={useDirectAudio ? t.instantMode : t.proxyStream}
             >
-              {useDirectAudio ? "Mode Instan" : "Stream Proxy"}
+              {useDirectAudio ? t.instantMode : t.proxyStream}
             </button>
 
             <button
@@ -83,7 +87,7 @@ export const AudioPreviewModal: React.FC<AudioPreviewModalProps> = ({
               className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-lg shadow-indigo-600/30 transition-all active:scale-95"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Unduh Audio</span>
+              <span>{t.downloadAudio}</span>
             </button>
           </div>
         </div>
@@ -91,4 +95,5 @@ export const AudioPreviewModal: React.FC<AudioPreviewModalProps> = ({
     </div>
   );
 };
+
 

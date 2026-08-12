@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { X, Server, Copy, Check, ExternalLink, Terminal, Globe, Code, ShieldCheck } from 'lucide-react';
+import { Language, translations } from '../lib/i18n';
 
 interface VercelDeployModalProps {
   isOpen: boolean;
   onClose: () => void;
+  lang?: Language;
 }
 
-export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, onClose }) => {
+export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, onClose, lang = 'id' }) => {
   const [copiedVercelJson, setCopiedVercelJson] = useState(false);
   const [copiedCli, setCopiedCli] = useState(false);
 
   if (!isOpen) return null;
+  const t = translations[lang];
 
   const vercelJsonContent = `{
   "version": 2,
@@ -55,8 +58,8 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
               <Server className="w-5 h-5 text-indigo-400" />
             </div>
             <div>
-              <h3 className="font-extrabold text-lg">Panduan Hosting di Vercel</h3>
-              <p className="text-xs text-gray-400">Siap Deploy Gratis dalam 1 Menit via Vercel Serverless</p>
+              <h3 className="font-extrabold text-lg">{t.deployGuideTitle}</h3>
+              <p className="text-xs text-gray-400">{t.deployDesc}</p>
             </div>
           </div>
           <button
@@ -75,10 +78,10 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
               <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-mono">
                 1
               </span>
-              <span>Export/Push Proyek ke GitHub</span>
+              <span>{t.step1}</span>
             </div>
             <p className="text-xs text-gray-400 leading-relaxed pl-8">
-              Gunakan menu Settings di Google AI Studio untuk menautkan repositori GitHub Anda atau download file ZIP proyek ini.
+              {t.step1Desc}
             </p>
           </div>
 
@@ -89,7 +92,7 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-mono">
                   2
                 </span>
-                <span>Konfigurasi vercel.json (Sudah Dibuatkan)</span>
+                <span>{t.step2}</span>
               </div>
               <button
                 onClick={() => copyToClipboard(vercelJsonContent, setCopiedVercelJson)}
@@ -98,16 +101,19 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
                 {copiedVercelJson ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Tersalin</span>
+                    <span>{lang === 'id' ? 'Tersalin' : 'Copied'}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Salin</span>
+                    <span>{lang === 'id' ? 'Salin' : 'Copy'}</span>
                   </>
                 )}
               </button>
             </div>
+            <p className="text-xs text-gray-400 leading-relaxed pl-8 mb-2">
+              {t.step2Desc}
+            </p>
             <pre className="mt-2 p-3 rounded-lg bg-black font-mono text-[11px] text-indigo-300 overflow-x-auto border border-white/10">
               {vercelJsonContent}
             </pre>
@@ -120,7 +126,7 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
                 <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-mono">
                   3
                 </span>
-                <span>Deploy via Vercel CLI atau Dashboard</span>
+                <span>{t.step3}</span>
               </div>
               <button
                 onClick={() => copyToClipboard('npm i -g vercel && vercel --prod', setCopiedCli)}
@@ -129,27 +135,34 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
                 {copiedCli ? (
                   <>
                     <Check className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>Tersalin</span>
+                    <span>{lang === 'id' ? 'Tersalin' : 'Copied'}</span>
                   </>
                 ) : (
                   <>
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Salin CLI</span>
+                    <span>Copy CLI</span>
                   </>
                 )}
               </button>
             </div>
             <div className="space-y-2 pl-8">
               <p className="text-xs text-gray-400">
-                Opsi A (Vercel Dashboard): Buka <a href="https://vercel.com/new" target="_blank" rel="noreferrer" className="text-indigo-400 underline">vercel.com/new</a>, impor repositori GitHub Anda, klik <strong>Deploy</strong>.
+                {t.step3Desc}
               </p>
-              <p className="text-xs text-gray-400">
-                Opsi B (Terminal / CLI):
-              </p>
-              <code className="block p-2 rounded bg-black font-mono text-xs text-green-400 border border-white/10">
-                npm i -g vercel && vercel --prod
-              </code>
             </div>
+          </div>
+
+          {/* Step 4 */}
+          <div className="p-4 rounded-xl bg-[#141414] border border-white/5">
+            <div className="flex items-center gap-2 font-bold text-indigo-300 mb-2">
+              <span className="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 text-xs font-mono">
+                4
+              </span>
+              <span>{t.step4}</span>
+            </div>
+            <p className="text-xs text-gray-400 leading-relaxed pl-8">
+              {t.step4Desc}
+            </p>
           </div>
         </div>
 
@@ -161,17 +174,18 @@ export const VercelDeployModal: React.FC<VercelDeployModalProps> = ({ isOpen, on
             rel="noreferrer"
             className="flex items-center gap-1.5 text-xs text-indigo-400 hover:underline font-semibold"
           >
-            <span>Buka Vercel Dashboard</span>
+            <span>Vercel Dashboard</span>
             <ExternalLink className="w-3.5 h-3.5" />
           </a>
           <button
             onClick={onClose}
             className="px-5 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
           >
-            Tutup
+            {t.closeBtn}
           </button>
         </div>
       </div>
     </div>
   );
 };
+

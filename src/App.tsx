@@ -8,8 +8,10 @@ import { AudioPreviewModal } from './components/AudioPreviewModal';
 import { PlaylistInfo, Track, ConversionSettings, DownloadQueueItem } from './types';
 import { triggerSingleDownload, downloadPlaylistAsZip, DEMO_PLAYLISTS } from './lib/opusConverter';
 import { Sparkles, Heart, Server } from 'lucide-react';
+import { Language, getInitialLanguage, translations } from './lib/i18n';
 
 export default function App() {
+  const [lang, setLang] = useState<Language>(getInitialLanguage());
   const [playlist, setPlaylist] = useState<PlaylistInfo | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | undefined>(undefined);
@@ -32,10 +34,17 @@ export default function App() {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [previewTrack, setPreviewTrack] = useState<Track | null>(null);
 
+  const toggleLanguage = () => {
+    setLang((prev) => (prev === 'id' ? 'en' : 'id'));
+  };
+
+  const t = translations[lang];
+
   // Load initial demo playlist on first start
   useEffect(() => {
     fetchPlaylist(DEMO_PLAYLISTS[0].url);
   }, []);
+
 
   const fetchPlaylist = async (inputUrl: string) => {
     setIsLoading(true);
@@ -197,6 +206,9 @@ export default function App() {
         onOpenDeployModal={() => setIsDeployModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
         bitrate={settings.bitrate}
+        containerFormat={settings.containerFormat}
+        lang={lang}
+        onToggleLang={toggleLanguage}
       />
 
       {/* Hero Section */}
@@ -205,6 +217,8 @@ export default function App() {
           onFetchPlaylist={fetchPlaylist}
           isLoading={isLoading}
           errorMessage={errorMessage}
+          containerFormat={settings.containerFormat}
+          lang={lang}
         />
 
         {/* Playlist Content View */}
@@ -223,6 +237,7 @@ export default function App() {
             batchProgress={batchProgress}
             playingTrackId={previewTrack?.id || null}
             onPlayPreview={(track) => setPreviewTrack(track)}
+            lang={lang}
           />
         )}
       </main>
@@ -232,6 +247,7 @@ export default function App() {
         track={previewTrack}
         onClose={() => setPreviewTrack(null)}
         onDownloadSingle={handleDownloadSingleTrack}
+        lang={lang}
       />
 
       {/* Settings Modal */}
@@ -240,12 +256,14 @@ export default function App() {
         onClose={() => setIsSettingsModalOpen(false)}
         settings={settings}
         onUpdateSettings={(newSet) => setSettings((prev) => ({ ...prev, ...newSet }))}
+        lang={lang}
       />
 
       {/* Vercel Deploy Modal */}
       <VercelDeployModal
         isOpen={isDeployModalOpen}
         onClose={() => setIsDeployModalOpen(false)}
+        lang={lang}
       />
 
       {/* Footer */}
@@ -253,11 +271,11 @@ export default function App() {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-indigo-400" />
-            <span className="font-semibold text-gray-300">TubeOpus Downloader & Converter</span>
+            <span className="font-semibold text-gray-300">TubeAudio Downloader & Converter</span>
           </div>
 
           <p className="flex items-center gap-1 text-gray-500">
-            Dibuat untuk streaming audio efisiensi tinggi dengan format Opus (Ogg/WebM). Siap deploy di Vercel.
+            {t.footerRights}
           </p>
 
           <button
@@ -265,10 +283,11 @@ export default function App() {
             className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 font-semibold"
           >
             <Server className="w-3.5 h-3.5" />
-            <span>Deploy ke Vercel</span>
+            <span>Deploy Vercel</span>
           </button>
         </div>
       </footer>
     </div>
   );
+
 }

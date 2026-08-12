@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, Pause, Download, CheckCircle2, AlertCircle, RefreshCw, Music } from 'lucide-react';
 import { Track, DownloadStatus } from '../types';
+import { Language, translations } from '../lib/i18n';
 
 interface TrackCardProps {
   track: Track;
@@ -12,6 +13,8 @@ interface TrackCardProps {
   isPlaying: boolean;
   onPlayPreview: (track: Track) => void;
   onDownloadSingle: (track: Track) => void;
+  containerFormat?: string;
+  lang?: Language;
 }
 
 export const TrackCard: React.FC<TrackCardProps> = ({
@@ -24,7 +27,11 @@ export const TrackCard: React.FC<TrackCardProps> = ({
   isPlaying,
   onPlayPreview,
   onDownloadSingle,
+  containerFormat = 'mp3',
+  lang = 'id',
 }) => {
+  const t = translations[lang];
+
   return (
     <div
       className={`group relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl border transition-all ${
@@ -61,7 +68,7 @@ export const TrackCard: React.FC<TrackCardProps> = ({
             className={`absolute inset-0 flex items-center justify-center transition-opacity ${
               isPlaying ? 'bg-black/70 opacity-100' : 'bg-black/50 opacity-0 group-hover/thumb:opacity-100'
             }`}
-            title={isPlaying ? 'Pause Preview' : 'Play Preview Audio'}
+            title={isPlaying ? 'Pause Preview' : t.previewAudio}
           >
             {isPlaying ? (
               <Pause className="w-5 h-5 text-indigo-400 fill-indigo-400" />
@@ -86,7 +93,7 @@ export const TrackCard: React.FC<TrackCardProps> = ({
           {status === 'converting' || status === 'fetching' ? (
             <div className="mt-2 w-full max-w-xs">
               <div className="flex justify-between text-[10px] text-indigo-400 font-mono mb-0.5">
-                <span>Proses Mengunduh Audio...</span>
+                <span>{t.downloadingAudio}</span>
                 <span>{progress}%</span>
               </div>
               <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden">
@@ -124,16 +131,17 @@ export const TrackCard: React.FC<TrackCardProps> = ({
               ? 'bg-white/5 text-gray-400 hover:bg-white/10'
               : 'bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
           }`}
-          title="Unduh trek ini (.opus)"
+          title={`${t.downloadTrack} (.${containerFormat.toLowerCase()})`}
         >
           {status === 'converting' || status === 'fetching' ? (
             <RefreshCw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
           ) : (
             <Download className="w-3.5 h-3.5" />
           )}
-          <span>.opus</span>
+          <span>.{containerFormat.toLowerCase()}</span>
         </button>
       </div>
     </div>
   );
 };
+

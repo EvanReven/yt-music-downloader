@@ -1,12 +1,14 @@
 import React from 'react';
 import { X, Sliders, Check, FileAudio, Info, Tag } from 'lucide-react';
 import { ConversionSettings, OpusBitrate } from '../types';
+import { Language, translations } from '../lib/i18n';
 
 interface ConversionSettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   settings: ConversionSettings;
   onUpdateSettings: (newSettings: Partial<ConversionSettings>) => void;
+  lang?: Language;
 }
 
 export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = ({
@@ -14,14 +16,17 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
   onClose,
   settings,
   onUpdateSettings,
+  lang = 'id',
 }) => {
   if (!isOpen) return null;
 
+  const t = translations[lang];
+
   const bitrates: Array<{ id: OpusBitrate; label: string; desc: string }> = [
-    { id: '64', label: '64 kbps', desc: 'Sangat Hemat Ukuran (Suara Bagus)' },
-    { id: '128', label: '128 kbps', desc: 'Standar Jernih (Disarankan)' },
-    { id: '160', label: '160 kbps', desc: 'Asli YouTube Native Opus (Kualitas Tinggi)' },
-    { id: '192', label: '192 kbps', desc: 'Kualitas Tinggi' },
+    { id: '64', label: '64 kbps', desc: t.ecoQuality },
+    { id: '128', label: '128 kbps', desc: t.standardQuality },
+    { id: '160', label: '160 kbps', desc: t.nativeQuality },
+    { id: '192', label: '192 kbps', desc: lang === 'id' ? 'Kualitas Tinggi' : 'High Quality' },
     { id: '256', label: '256 kbps', desc: 'Ultra High Fidelity' },
   ];
 
@@ -32,7 +37,7 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
         <div className="flex items-center justify-between pb-4 border-b border-white/10">
           <div className="flex items-center gap-2">
             <Sliders className="w-5 h-5 text-indigo-400" />
-            <h3 className="font-bold text-lg">Pengaturan Audio Opus</h3>
+            <h3 className="font-bold text-lg">{t.settingsTitle}</h3>
           </div>
           <button
             onClick={onClose}
@@ -46,7 +51,7 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
           {/* Bitrate Selector */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-              Kualitas Bitrate Opus
+              {t.bitrateLabel}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {bitrates.map((b) => (
@@ -72,15 +77,15 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
           {/* Container Extension Format */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-              Ekstensi File Output (Format Audio)
+              {t.formatExtLabel}
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {[
-                { fmt: 'mp3', label: '.MP3', tag: 'Disarankan (Semua Perangkat)' },
-                { fmt: 'm4a', label: '.M4A', tag: 'AAC Jernih (Apple / Android)' },
-                { fmt: 'opus', label: '.OPUS', tag: 'Codec Kualitas Tinggi' },
-                { fmt: 'ogg', label: '.OGG', tag: 'Format Audio Web' },
-                { fmt: 'webm', label: '.WEBM', tag: 'Format Container Web' },
+                { fmt: 'mp3', label: '.MP3', tag: t.fmtMp3Tag },
+                { fmt: 'm4a', label: '.M4A', tag: t.fmtM4aTag },
+                { fmt: 'opus', label: '.OPUS', tag: t.fmtOpusTag },
+                { fmt: 'ogg', label: '.OGG', tag: t.fmtOggTag },
+                { fmt: 'webm', label: '.WEBM', tag: t.fmtWebmTag },
               ].map(({ fmt, label, tag }) => (
                 <button
                   key={fmt}
@@ -101,13 +106,13 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
           {/* Filename Naming Pattern */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-              Pola Nama File Output
+              {t.namingPatternLabel}
             </label>
             <div className="space-y-2">
               {[
-                { id: '{index} - {title}', label: `01 - Judul Lagu.${settings.containerFormat}` },
-                { id: '{artist} - {title}', label: `Artis - Judul Lagu.${settings.containerFormat}` },
-                { id: '{title}', label: `Judul Lagu.${settings.containerFormat}` },
+                { id: '{index} - {title}', label: `01 - ${lang === 'id' ? 'Judul Lagu' : 'Song Title'}.${settings.containerFormat}` },
+                { id: '{artist} - {title}', label: `${lang === 'id' ? 'Artis - Judul Lagu' : 'Artist - Song Title'}.${settings.containerFormat}` },
+                { id: '{title}', label: `${lang === 'id' ? 'Judul Lagu' : 'Song Title'}.${settings.containerFormat}` },
               ].map((pattern) => (
                 <button
                   key={pattern.id}
@@ -132,10 +137,11 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
             onClick={onClose}
             className="px-5 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white transition-colors"
           >
-            Simpan & Selesai
+            {t.saveClose}
           </button>
         </div>
       </div>
     </div>
   );
 };
+

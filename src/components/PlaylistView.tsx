@@ -3,6 +3,7 @@ import { Download, FileArchive, CheckSquare, Square, Filter, Music2, Sliders, Sp
 import { PlaylistInfo, Track, DownloadQueueItem, ConversionSettings } from '../types';
 import { TrackCard } from './TrackCard';
 import { formatDuration } from '../lib/youtube';
+import { Language, translations } from '../lib/i18n';
 
 interface PlaylistViewProps {
   playlist: PlaylistInfo;
@@ -18,6 +19,7 @@ interface PlaylistViewProps {
   batchProgress: { completed: number; total: number; percent: number };
   playingTrackId: string | null;
   onPlayPreview: (track: Track) => void;
+  lang: Language;
 }
 
 export const PlaylistView: React.FC<PlaylistViewProps> = ({
@@ -34,8 +36,10 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
   batchProgress,
   playingTrackId,
   onPlayPreview,
+  lang,
 }) => {
   const [searchFilter, setSearchFilter] = useState('');
+  const t = translations[lang];
 
   // Calculate total playlist duration
   const totalSeconds = useMemo(() => {
@@ -72,7 +76,7 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
               <span className="absolute bottom-2 left-2 px-2 py-0.5 rounded bg-black/90 text-[10px] font-mono text-indigo-400 font-bold border border-white/10">
-                {playlist.trackCount} Trek
+                {playlist.trackCount} {lang === 'id' ? 'Trek' : 'Tracks'}
               </span>
             </div>
 
@@ -85,7 +89,7 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
                 {playlist.title}
               </h2>
               <p className="text-xs sm:text-sm text-gray-400 mt-1 flex items-center gap-2">
-                <span>Oleh <strong className="text-gray-200">{playlist.author}</strong></span>
+                <span>{lang === 'id' ? 'Oleh' : 'By'} <strong className="text-gray-200">{playlist.author}</strong></span>
                 <span>•</span>
                 <span className="flex items-center gap-1 font-mono">
                   <Clock className="w-3.5 h-3.5 text-gray-500" />
@@ -103,10 +107,10 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 transition-colors"
             >
               <Sliders className="w-4 h-4 text-indigo-400" />
-              <span>Pengaturan Format</span>
+              <span>{t.settingsTitle}</span>
             </button>
 
-            {/* Batch ZIP / Single Opus download button */}
+            {/* Batch ZIP / Single download button */}
             <button
               onClick={onBatchDownloadZip}
               disabled={isBatchDownloading || selectedTrackIds.length === 0}
@@ -119,8 +123,10 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
               )}
               <span>
                 {selectedTrackIds.length === 1
-                  ? `Download 1 Trek (.${settings.containerFormat.toUpperCase()})`
-                  : `Download ${selectedTrackIds.length} Trek (.ZIP ${settings.containerFormat.toUpperCase()})`}
+                  ? `${t.downloadSingle} (.${settings.containerFormat.toUpperCase()})`
+                  : t.downloadBatchZip
+                      .replace('{count}', String(selectedTrackIds.length))
+                      .replace('{fmt}', settings.containerFormat.toUpperCase())}
               </span>
             </button>
           </div>
@@ -132,7 +138,7 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
             <div className="flex items-center justify-between text-xs font-semibold text-indigo-300 mb-2">
               <span className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 animate-spin text-indigo-400" />
-                Mempersiapkan ZIP Batch Opus ({batchProgress.completed} / {batchProgress.total} Trek)
+                {t.preparingZip.replace('{fmt}', settings.containerFormat.toUpperCase())} ({batchProgress.completed} / {batchProgress.total} {lang === 'id' ? 'Trek' : 'Tracks'})
               </span>
               <span className="font-mono text-sm">{batchProgress.percent}%</span>
             </div>
@@ -156,18 +162,18 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
             {allFilteredSelected ? (
               <>
                 <CheckSquare className="w-4 h-4 text-indigo-400" />
-                <span>Hapus Semua Pilihan</span>
+                <span>{t.deselectAll}</span>
               </>
             ) : (
               <>
                 <Square className="w-4 h-4 text-gray-500" />
-                <span>Pilih Semua ({filteredTracks.length})</span>
+                <span>{t.selectAll} ({filteredTracks.length})</span>
               </>
             )}
           </button>
 
           <span className="text-xs text-gray-400 font-medium">
-            Terpilih: <strong className="text-indigo-400">{selectedTrackIds.length}</strong> / {playlist.trackCount}
+            {t.selectedTracks}: <strong className="text-indigo-400">{selectedTrackIds.length}</strong> / {playlist.trackCount}
           </span>
         </div>
 
@@ -178,7 +184,7 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
             type="text"
             value={searchFilter}
             onChange={(e) => setSearchFilter(e.target.value)}
-            placeholder="Cari lagu di playlist..."
+            placeholder={lang === 'id' ? "Cari lagu di playlist..." : "Search song in playlist..."}
             className="w-full bg-[#161616] border border-white/10 focus:border-indigo-500/80 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder:text-gray-500 focus:outline-none"
           />
         </div>
@@ -188,7 +194,7 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
       <div className="space-y-2.5">
         {filteredTracks.length === 0 ? (
           <div className="text-center py-12 text-gray-500 text-sm">
-            Tidak ada lagu yang cocok dengan pencarian "{searchFilter}".
+            {lang === 'id' ? `Tidak ada lagu yang cocok dengan pencarian "${searchFilter}".` : `No tracks found matching "${searchFilter}".`}
           </div>
         ) : (
           filteredTracks.map((track) => {
@@ -205,6 +211,8 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
                 isPlaying={playingTrackId === track.id}
                 onPlayPreview={onPlayPreview}
                 onDownloadSingle={onDownloadSingleTrack}
+                containerFormat={settings.containerFormat}
+                lang={lang}
               />
             );
           })
@@ -213,3 +221,4 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
     </div>
   );
 };
+
