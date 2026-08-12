@@ -24,7 +24,7 @@ export interface ConversionSettings {
   bitrate: OpusBitrate;
   namingFormat: '{index} - {title}' | '{artist} - {title}' | '{title}';
   includeMetadata: boolean;
-  containerFormat: 'opus' | 'ogg' | 'webm';
+  containerFormat: 'mp3' | 'm4a' | 'opus' | 'ogg' | 'webm';
   downloadAsZip: boolean;
 }
 

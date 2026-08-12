@@ -72,20 +72,27 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
           {/* Container Extension Format */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-              Ekstensi File Output
+              Ekstensi File Output (Format Audio)
             </label>
-            <div className="grid grid-cols-3 gap-2">
-              {(['opus', 'ogg', 'webm'] as const).map((fmt) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {[
+                { fmt: 'mp3', label: '.MP3', tag: 'Disarankan (Semua Perangkat)' },
+                { fmt: 'm4a', label: '.M4A', tag: 'AAC Jernih (Apple / Android)' },
+                { fmt: 'opus', label: '.OPUS', tag: 'Codec Kualitas Tinggi' },
+                { fmt: 'ogg', label: '.OGG', tag: 'Format Audio Web' },
+                { fmt: 'webm', label: '.WEBM', tag: 'Format Container Web' },
+              ].map(({ fmt, label, tag }) => (
                 <button
                   key={fmt}
-                  onClick={() => onUpdateSettings({ containerFormat: fmt })}
-                  className={`py-2 px-3 rounded-xl border text-xs font-bold uppercase transition-all ${
+                  onClick={() => onUpdateSettings({ containerFormat: fmt as any })}
+                  className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
                     settings.containerFormat === fmt
-                      ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300'
+                      ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300 font-bold'
                       : 'bg-[#141414] border-white/5 text-gray-400 hover:text-gray-200'
                   }`}
                 >
-                  .{fmt}
+                  <span className="text-xs font-black">{label}</span>
+                  <span className="text-[10px] text-gray-500 line-clamp-1">{tag}</span>
                 </button>
               ))}
             </div>
@@ -98,9 +105,9 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
             </label>
             <div className="space-y-2">
               {[
-                { id: '{index} - {title}', label: '01 - Judul Lagu.opus' },
-                { id: '{artist} - {title}', label: 'Artis - Judul Lagu.opus' },
-                { id: '{title}', label: 'Judul Lagu.opus' },
+                { id: '{index} - {title}', label: `01 - Judul Lagu.${settings.containerFormat}` },
+                { id: '{artist} - {title}', label: `Artis - Judul Lagu.${settings.containerFormat}` },
+                { id: '{title}', label: `Judul Lagu.${settings.containerFormat}` },
               ].map((pattern) => (
                 <button
                   key={pattern.id}

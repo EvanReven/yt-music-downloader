@@ -86,7 +86,7 @@ export const TrackCard: React.FC<TrackCardProps> = ({
           {status === 'converting' || status === 'fetching' ? (
             <div className="mt-2 w-full max-w-xs">
               <div className="flex justify-between text-[10px] text-indigo-400 font-mono mb-0.5">
-                <span>Proses Mengunduh Opus...</span>
+                <span>Proses Mengunduh Audio...</span>
                 <span>{progress}%</span>
               </div>
               <div className="w-full h-1.5 bg-black/60 rounded-full overflow-hidden">

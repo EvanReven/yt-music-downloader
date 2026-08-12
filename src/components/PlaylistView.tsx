@@ -106,15 +106,21 @@ export const PlaylistView: React.FC<PlaylistViewProps> = ({
               <span>Pengaturan Format</span>
             </button>
 
-            {/* Batch ZIP download button */}
+            {/* Batch ZIP / Single Opus download button */}
             <button
               onClick={onBatchDownloadZip}
               disabled={isBatchDownloading || selectedTrackIds.length === 0}
               className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-50 transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
             >
-              <FileArchive className="w-4 h-4" />
+              {selectedTrackIds.length === 1 ? (
+                <Download className="w-4 h-4" />
+              ) : (
+                <FileArchive className="w-4 h-4" />
+              )}
               <span>
-                Download {selectedTrackIds.length} Trek (.ZIP Opus)
+                {selectedTrackIds.length === 1
+                  ? `Download 1 Trek (.${settings.containerFormat.toUpperCase()})`
+                  : `Download ${selectedTrackIds.length} Trek (.ZIP ${settings.containerFormat.toUpperCase()})`}
               </span>
             </button>
           </div>

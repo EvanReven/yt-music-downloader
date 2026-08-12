@@ -21,7 +21,7 @@ export default function App() {
     bitrate: '160',
     namingFormat: '{index} - {title}',
     includeMetadata: true,
-    containerFormat: 'opus',
+    containerFormat: 'mp3',
     downloadAsZip: true,
   });
 

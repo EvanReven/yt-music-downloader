@@ -51,7 +51,7 @@ export async function downloadTrackAudioBlob(
   onProgress?: (percent: number) => void
 ): Promise<{ blob: Blob; filename: string }> {
   const filename = buildFilename(track, settings.namingFormat, settings.containerFormat);
-  const streamUrl = `/api/proxy-audio?v=${track.id}&title=${encodeURIComponent(track.title)}&ext=${settings.containerFormat}`;
+  const streamUrl = `/api/proxy-audio?v=${track.id}&title=${encodeURIComponent(track.title)}&artist=${encodeURIComponent(track.channel || '')}&ext=${settings.containerFormat}`;
 
   try {
     if (onProgress) onProgress(15);
@@ -63,6 +63,7 @@ export async function downloadTrackAudioBlob(
 
     if (onProgress) onProgress(40);
 
+    const contentType = response.headers.get('content-type') || 'audio/ogg';
     const contentLength = response.headers.get('content-length');
     const total = contentLength ? parseInt(contentLength, 10) : 0;
 
@@ -90,8 +91,7 @@ export async function downloadTrackAudioBlob(
     if (onProgress) onProgress(98);
 
     // Combine chunks into single Blob
-    const mimeType = settings.containerFormat === 'opus' ? 'audio/opus' : 'audio/webm';
-    const blob = new Blob(chunks, { type: mimeType });
+    const blob = new Blob(chunks, { type: contentType });
 
     if (onProgress) onProgress(100);
 
@@ -124,6 +124,23 @@ export async function downloadPlaylistAsZip(
   onTrackProgress?: (trackId: string, percent: number, status: string) => void,
   onTotalProgress?: (completedCount: number, totalCount: number, overallPercent: number) => void
 ): Promise<void> {
+  // If only 1 track is selected, download directly as .opus file without compression
+  if (tracks.length === 1) {
+    const track = tracks[0];
+    if (onTrackProgress) onTrackProgress(track.id, 10, 'Mengunduh stream...');
+    const { blob, filename } = await downloadTrackAudioBlob(
+      track,
+      settings,
+      (pct) => {
+        if (onTrackProgress) onTrackProgress(track.id, pct, `Proses ${pct}%`);
+      }
+    );
+    if (onTrackProgress) onTrackProgress(track.id, 100, 'Selesai');
+    if (onTotalProgress) onTotalProgress(1, 1, 100);
+    saveAs(blob, filename);
+    return;
+  }
+
   const zip = new JSZip();
   const folder = zip.folder(playlistTitle.replace(/[^a-zA-Z0-9 _-]/g, '_') || 'Opus_Playlist');
 
