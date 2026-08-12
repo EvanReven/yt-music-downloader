@@ -43,7 +43,7 @@ const PIPED_INSTANCES = [
 /**
  * Helper to fetch with timeout
  */
-async function fetchWithTimeout(url: string, timeoutMs = 7000) {
+async function fetchWithTimeout(url: string, timeoutMs = 2500) {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -201,61 +201,79 @@ function getFallbackPlaylistData(playlistId: string) {
  */
 export async function getPlaylistDetails(playlistId: string) {
   // Method 1: Try Direct YouTube Scraper
-  const scraped = await getPlaylistFromYoutubeScraper(playlistId);
-  if (scraped) return scraped;
+  try {
+    const scraped = await getPlaylistFromYoutubeScraper(playlistId);
+    if (scraped && scraped.tracks.length > 0) return scraped;
+  } catch (e) {
+    // Proceed to parallel mirrors
+  }
 
-  // Method 2: Try Invidious Instances with Safe JSON Parsing
-  for (const instance of INVIDIOUS_INSTANCES) {
-    try {
-      const apiUrl = `${instance}/api/v1/playlists/${playlistId}`;
-      const res = await fetchWithTimeout(apiUrl, 5000);
-      if (!res.ok) continue;
+  // Method 2: Parallel fetch top Invidious instances
+  const fetchInvidiousInstance = async (instance: string) => {
+    const apiUrl = `${instance}/api/v1/playlists/${playlistId}`;
+    const res = await fetchWithTimeout(apiUrl, 2800);
+    if (!res.ok) throw new Error('Failed status');
 
-      const contentType = res.headers.get('content-type') || '';
-      if (!contentType.includes('application/json')) continue;
+    const contentType = res.headers.get('content-type') || '';
+    if (!contentType.includes('application/json')) throw new Error('Not JSON');
 
-      const data: InvidiousPlaylistResponse = await res.json();
-      if (!data || !data.videos) continue;
+    const data: InvidiousPlaylistResponse = await res.json();
+    if (!data || !data.videos || data.videos.length === 0) throw new Error('No videos');
 
-      const tracks = data.videos.map((vid, idx) => {
-        let thumb = `https://i.ytimg.com/vi/${vid.videoId}/hqdefault.jpg`;
-        if (vid.videoThumbnails && vid.videoThumbnails.length > 0) {
-          const hq = vid.videoThumbnails.find(t => t.quality === 'medium' || t.quality === 'high');
-          if (hq) thumb = hq.url.startsWith('//') ? `https:${hq.url}` : hq.url;
-        }
+    const tracks = data.videos.map((vid, idx) => {
+      let thumb = `https://i.ytimg.com/vi/${vid.videoId}/hqdefault.jpg`;
+      if (vid.videoThumbnails && vid.videoThumbnails.length > 0) {
+        const hq = vid.videoThumbnails.find(t => t.quality === 'medium' || t.quality === 'high');
+        if (hq) thumb = hq.url.startsWith('//') ? `https:${hq.url}` : hq.url;
+      }
 
-        const mins = Math.floor(vid.lengthSeconds / 60);
-        const secs = (vid.lengthSeconds % 60).toString().padStart(2, '0');
-
-        return {
-          id: vid.videoId,
-          title: vid.title || `Track ${idx + 1}`,
-          channel: vid.author || data.author || 'YouTube Music',
-          duration: vid.lengthSeconds || 0,
-          durationFormatted: `${mins}:${secs}`,
-          thumbnail: thumb,
-          index: idx + 1
-        };
-      });
+      const mins = Math.floor(vid.lengthSeconds / 60);
+      const secs = (vid.lengthSeconds % 60).toString().padStart(2, '0');
 
       return {
-        id: data.playlistId || playlistId,
-        title: data.title || 'YouTube Playlist',
-        author: data.author || 'YouTube',
-        description: data.description || '',
-        thumbnail: tracks[0]?.thumbnail || `https://i.ytimg.com/vi/${tracks[0]?.id}/hqdefault.jpg`,
-        trackCount: tracks.length,
-        tracks
+        id: vid.videoId,
+        title: vid.title || `Track ${idx + 1}`,
+        channel: vid.author || data.author || 'YouTube Music',
+        duration: vid.lengthSeconds || 0,
+        durationFormatted: `${mins}:${secs}`,
+        thumbnail: thumb,
+        index: idx + 1
       };
-    } catch (err: any) {
-      // try next instance
-    }
+    });
+
+    return {
+      id: data.playlistId || playlistId,
+      title: data.title || 'YouTube Playlist',
+      author: data.author || 'YouTube',
+      description: data.description || '',
+      thumbnail: tracks[0]?.thumbnail || `https://i.ytimg.com/vi/${tracks[0]?.id}/hqdefault.jpg`,
+      trackCount: tracks.length,
+      tracks
+    };
+  };
+
+  try {
+    // Try first batch of 5 instances in parallel
+    const topInstances = INVIDIOUS_INSTANCES.slice(0, 5);
+    const result = await Promise.any(topInstances.map(fetchInvidiousInstance));
+    if (result) return result;
+  } catch (err) {
+    // try next batch or piped
+  }
+
+  try {
+    // Try second batch of 5 instances
+    const secondInstances = INVIDIOUS_INSTANCES.slice(5, 10);
+    const result = await Promise.any(secondInstances.map(fetchInvidiousInstance));
+    if (result) return result;
+  } catch (err) {
+    // try piped
   }
 
   // Method 3: Try Piped API Instances
   for (const piped of PIPED_INSTANCES) {
     try {
-      const res = await fetchWithTimeout(`${piped}/playlists/${playlistId}`, 5000);
+      const res = await fetchWithTimeout(`${piped}/playlists/${playlistId}`, 2500);
       if (!res.ok) continue;
 
       const contentType = res.headers.get('content-type') || '';
@@ -288,7 +306,7 @@ export async function getPlaylistDetails(playlistId: string) {
     }
   }
 
-  // Method 4: Always return fallback data so user is never blocked!
+  // Method 4: Always return fallback data so Vercel function never fails or times out!
   return getFallbackPlaylistData(playlistId);
 }
 
