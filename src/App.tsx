@@ -42,19 +42,24 @@ export default function App() {
     setErrorMessage(undefined);
     try {
       const res = await fetch(`/api/playlist?url=${encodeURIComponent(inputUrl)}`);
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.error || `HTTP ${res.status}: Gagal memuat playlist`);
+      let data: any = null;
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error('Gagal membaca data server. Silakan coba lagi beberapa saat.');
       }
 
-      const data: PlaylistInfo = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || `HTTP ${res.status}: Gagal memuat playlist`);
+      }
+
       if (!data || !data.tracks || data.tracks.length === 0) {
         throw new Error('Playlist tidak ditemukan atau tidak memiliki trek audio.');
       }
 
       setPlaylist(data);
       // Default select all tracks
-      setSelectedTrackIds(data.tracks.map((t) => t.id));
+      setSelectedTrackIds(data.tracks.map((t: Track) => t.id));
       setQueueMap(new Map());
     } catch (err: any) {
       console.error('Fetch Playlist Error:', err);
