@@ -1,0 +1,6 @@
+{
+  "name": "YouTube Playlist Opus Downloader",
+  "description": "Aplikasi web converter & downloader playlist YouTube ke format Opus audio, dilengkapi batch download, metadata ID3, dan konfigurasi siap-deploy Vercel.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
