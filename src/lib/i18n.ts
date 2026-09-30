@@ -12,6 +12,8 @@ export function getInitialLanguage(): Language {
 
 export const translations = {
   id: {
+    tabTitle: 'TubeAudio - Download Audio & Playlist YouTube',
+    tabDownloading: 'Mengunduh',
     headerSub: 'YouTube Playlist Audio Downloader & Converter',
     formatLabel: 'Format',
     deployBtn: 'Deploy Vercel',
@@ -84,6 +86,8 @@ export const translations = {
     footerRights: 'Dibuat untuk konversi & unduh audio YouTube efisiensi tinggi. Siap deploy di Vercel.'
   },
   en: {
+    tabTitle: 'TubeAudio - YouTube Playlist & Audio Downloader',
+    tabDownloading: 'Downloading',
     headerSub: 'YouTube Playlist Audio Downloader & Converter',
     formatLabel: 'Format',
     deployBtn: 'Deploy Vercel',

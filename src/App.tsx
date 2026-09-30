@@ -40,6 +40,17 @@ export default function App() {
 
   const t = translations[lang];
 
+  // Dynamic Browser Tab Title synchronization
+  useEffect(() => {
+    if (isBatchDownloading) {
+      document.title = `(${batchProgress.percent}%) ${t.tabDownloading}... | TubeAudio`;
+    } else if (playlist && playlist.title) {
+      document.title = `${playlist.title} | TubeAudio`;
+    } else {
+      document.title = t.tabTitle;
+    }
+  }, [lang, playlist, isBatchDownloading, batchProgress.percent, t]);
+
   // Load initial demo playlist on first start
   useEffect(() => {
     fetchPlaylist(DEMO_PLAYLISTS[0].url);
