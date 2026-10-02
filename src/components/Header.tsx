@@ -1,9 +1,8 @@
 import React from 'react';
-import { Music, Server, Sparkles, Globe } from 'lucide-react';
+import { Sparkles, Globe } from 'lucide-react';
 import { Language, translations } from '../lib/i18n';
 
 interface HeaderProps {
-  onOpenDeployModal: () => void;
   onOpenSettingsModal: () => void;
   bitrate: string;
   containerFormat: string;
@@ -12,7 +11,6 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
-  onOpenDeployModal,
   onOpenSettingsModal,
   bitrate,
   containerFormat,
@@ -64,16 +62,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
             <span>{t.formatLabel}: <strong className="text-indigo-300">{bitrate} kbps .{containerFormat.toUpperCase()}</strong></span>
-          </button>
-
-          {/* Vercel Deploy Guide Button */}
-          <button
-            onClick={onOpenDeployModal}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/20 transition-all transform active:scale-95"
-          >
-            <Server className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{t.deployBtn}</span>
-            <span className="sm:hidden">Vercel</span>
           </button>
         </div>
       </div>

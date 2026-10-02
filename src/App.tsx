@@ -3,11 +3,10 @@ import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { PlaylistView } from './components/PlaylistView';
 import { ConversionSettingsModal } from './components/ConversionSettingsModal';
-import { VercelDeployModal } from './components/VercelDeployModal';
 import { AudioPreviewModal } from './components/AudioPreviewModal';
 import { PlaylistInfo, Track, ConversionSettings, DownloadQueueItem } from './types';
 import { triggerSingleDownload, downloadPlaylistAsZip, DEMO_PLAYLISTS } from './lib/opusConverter';
-import { Sparkles, Heart, Server } from 'lucide-react';
+import { Sparkles, Heart } from 'lucide-react';
 import { Language, getInitialLanguage, translations } from './lib/i18n';
 
 export default function App() {
@@ -30,7 +29,6 @@ export default function App() {
   const [isBatchDownloading, setIsBatchDownloading] = useState(false);
   const [batchProgress, setBatchProgress] = useState({ completed: 0, total: 0, percent: 0 });
 
-  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [previewTrack, setPreviewTrack] = useState<Track | null>(null);
 
@@ -214,7 +212,6 @@ export default function App() {
     <div className="min-h-screen bg-[#0a0a0a] text-[#e0e0e0] flex flex-col font-sans antialiased selection:bg-indigo-600 selection:text-white">
       {/* Header */}
       <Header
-        onOpenDeployModal={() => setIsDeployModalOpen(true)}
         onOpenSettingsModal={() => setIsSettingsModalOpen(true)}
         bitrate={settings.bitrate}
         containerFormat={settings.containerFormat}
@@ -270,13 +267,6 @@ export default function App() {
         lang={lang}
       />
 
-      {/* Vercel Deploy Modal */}
-      <VercelDeployModal
-        isOpen={isDeployModalOpen}
-        onClose={() => setIsDeployModalOpen(false)}
-        lang={lang}
-      />
-
       {/* Footer */}
       <footer className="border-t border-white/5 bg-[#0f0f0f] py-8 px-4 sm:px-6 lg:px-8 text-center text-xs text-gray-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -288,14 +278,6 @@ export default function App() {
           <p className="flex items-center gap-1 text-gray-500">
             {t.footerRights}
           </p>
-
-          <button
-            onClick={() => setIsDeployModalOpen(true)}
-            className="flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 font-semibold"
-          >
-            <Server className="w-3.5 h-3.5" />
-            <span>Deploy Vercel</span>
-          </button>
         </div>
       </footer>
     </div>

@@ -83,7 +83,7 @@ export const translations = {
     closeBtn: 'Tutup',
 
     // Footer
-    footerRights: 'Dibuat untuk konversi & unduh audio YouTube efisiensi tinggi. Siap deploy di Vercel.'
+    footerRights: 'Dibuat untuk konversi & unduh audio YouTube efisiensi tinggi dengan kualitas studio.'
   },
   en: {
     tabTitle: 'TubeAudio - YouTube Playlist & Audio Downloader',
@@ -157,6 +157,6 @@ export const translations = {
     closeBtn: 'Close',
 
     // Footer
-    footerRights: 'Built for high efficiency YouTube audio conversion & downloads. Vercel deploy ready.'
+    footerRights: 'Built for high efficiency YouTube audio conversion & downloads with studio quality.'
   }
 };
