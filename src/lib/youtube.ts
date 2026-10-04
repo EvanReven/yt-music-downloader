@@ -66,7 +66,7 @@ export function sanitizeFilename(name: string): string {
 export function buildFilename(
   track: Track,
   pattern: '{index} - {title}' | '{artist} - {title}' | '{title}',
-  extension: string = 'opus'
+  extension: string = 'mp3'
 ): string {
   const indexStr = track.index < 10 ? `0${track.index}` : `${track.index}`;
   const cleanTitle = sanitizeFilename(track.title);

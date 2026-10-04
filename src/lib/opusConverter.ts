@@ -142,7 +142,7 @@ export async function downloadPlaylistAsZip(
   }
 
   const zip = new JSZip();
-  const folder = zip.folder(playlistTitle.replace(/[^a-zA-Z0-9 _-]/g, '_') || 'Opus_Playlist');
+  const folder = zip.folder(playlistTitle.replace(/[^a-zA-Z0-9 _-]/g, '_') || 'MP3_Playlist');
 
   let completed = 0;
   const total = tracks.length;
@@ -185,6 +185,6 @@ export async function downloadPlaylistAsZip(
     }
   );
 
-  const cleanZipName = `${playlistTitle.replace(/[^a-zA-Z0-9 _-]/g, '_') || 'Playlist'}_Opus.zip`;
+  const cleanZipName = `${playlistTitle.replace(/[^a-zA-Z0-9 _-]/g, '_') || 'Playlist'}_MP3.zip`;
   saveAs(zipBlob, cleanZipName);
 }

@@ -74,32 +74,30 @@ export const ConversionSettingsModal: React.FC<ConversionSettingsModalProps> = (
             </div>
           </div>
 
-          {/* Container Extension Format */}
+          {/* Container Extension Format (MP3 Exclusive) */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
               {t.formatExtLabel}
             </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {[
-                { fmt: 'mp3', label: '.MP3', tag: t.fmtMp3Tag },
-                { fmt: 'm4a', label: '.M4A', tag: t.fmtM4aTag },
-                { fmt: 'opus', label: '.OPUS', tag: t.fmtOpusTag },
-                { fmt: 'ogg', label: '.OGG', tag: t.fmtOggTag },
-                { fmt: 'webm', label: '.WEBM', tag: t.fmtWebmTag },
-              ].map(({ fmt, label, tag }) => (
-                <button
-                  key={fmt}
-                  onClick={() => onUpdateSettings({ containerFormat: fmt as any })}
-                  className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
-                    settings.containerFormat === fmt
-                      ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300 font-bold'
-                      : 'bg-[#141414] border-white/5 text-gray-400 hover:text-gray-200'
-                  }`}
-                >
-                  <span className="text-xs font-black">{label}</span>
-                  <span className="text-[10px] text-gray-500 line-clamp-1">{tag}</span>
-                </button>
-              ))}
+            <div className="flex items-center justify-between p-3.5 rounded-xl border bg-indigo-500/10 border-indigo-500/50 text-indigo-300">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center">
+                  <FileAudio className="w-5 h-5 text-indigo-400" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-extrabold text-white">.MP3</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold uppercase border border-indigo-500/30">
+                      Audio
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-gray-400 mt-0.5 block">{t.fmtMp3Tag}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-500/20 text-indigo-300 text-xs font-semibold">
+                <Check className="w-4 h-4 text-indigo-400" />
+                <span>{lang === 'id' ? 'Aktif' : 'Active'}</span>
+              </div>
             </div>
           </div>
 
